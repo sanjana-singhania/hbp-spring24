@@ -1,3 +1,5 @@
+const urlList = [];
+
 document.addEventListener('DOMContentLoaded', function() {
   // Select DOM elements
   const countdownInput = document.getElementById('countdownInput');
@@ -7,9 +9,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const timerDisplay = document.getElementById('timer');
 
   let productive = ['Fish-tastic Job!', 'Keep Swimming', 'You(\'re) really fish-tastic!',
-'I sea you working...', 'A true ocean master!', 'You(\'re) such a starfish!']
-let unproductive = ['Don(\'t) forget about your fish!', 'Oh, barnacles.',
- 'I don(\'t) sea you working hard', 'I(\'m) getting flooded...', ':(((', 'Wrong tab!']
+'I sea you working...', 'A true ocean master!', `You're such a starfish!`]
+let unproductive = [`Don't forget about your fish!`, 'Oh, barnacles.',
+ `I don't sea you working hard`, `I'm getting flooded...`, ':(((', 'Wrong tab!']
 
 function chooseMessage() {
   let num = Math.floor(Math.random() * 6)
@@ -18,9 +20,10 @@ function chooseMessage() {
   } else {
     return unproductive[num];
   }
-  
 }
 
+const chosenMessageText = document.getElementById('chosenMessage');
+chosenMessageText.innerText = chooseMessage();
 
   let timerInterval; // Variable to hold the setInterval ID
   let countdownTime; // Variable to hold the remaining countdown time
