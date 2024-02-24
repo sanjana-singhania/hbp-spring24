@@ -13,3 +13,8 @@ body{
     margin-top: 20px;
     text-align: center;
 }
+.settings {
+    background-color: transparent;
+    max-width: 50%;
+    max-height: 50%;
+}
