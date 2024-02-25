@@ -10,22 +10,7 @@ section {
     overflow-y: auto;
     background-color: white;
 }
-/*
-.sidebar ul {
-    list-style-type: none;
-    display: flex;
-    justify-content: space-around;
-    padding: 0;
-    top: 1vh;
-    vertical-align: bottom;
-}
 
-.sidebar li {
-    padding: 2px 0px;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 10px;
-}
-*/
 .blockedURL {
     position: absolute;
     left: 50%;

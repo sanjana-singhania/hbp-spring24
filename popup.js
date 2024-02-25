@@ -1,53 +1,74 @@
 
-var listURL = document.getElementById("blockedURL");
-
 document.addEventListener('DOMContentLoaded', function() {
-  // Select DOM elements
-  const countdownInput = document.getElementById('countdownInput');
-  const startButton = document.getElementById('startButton');
-  const pauseButton = document.getElementById('pauseButton');
-  const resetButton = document.getElementById('resetButton');
-  const timerDisplay = document.getElementById('timer');
-
-  let productive = ['Fish-tastic job!', 'Keep swimming', 'You(\'re) really fish-tastic!',
-'I sea you working...', 'A true ocean master!', `You're such a starfish!`]
-  let unproductive = [`Don't forget about your fish!`, 'Oh, barnacles.',
-  `I don't sea you working hard.`, `I'm getting flooded...`, 'Your fish are gonna drown!', 'Wrong tab!', 
-  'Someone(\'s) finally taking a shower...', 'Make more waves with your productivity']
-
-  // chrome.runtime.sendMessage({greeting: "hello"}, function(response) {
-  //   console.log(response.farewell);
-  // })
-
-  function chooseMessage() {
-    let num = Math.floor(Math.random() * 6)
-    console.log(listURL);
-    if(listURL == null) {
-      return productive[num];
-    }
-    if (listURL.some(url => listURL.includes(url))) {
-      return unproductive[num];
-    } else {
-      return productive[num];
-    }
-  }
-
   const chosenMessageText = document.getElementById('chosenMessage');
-  chosenMessageText.innerText = chooseMessage();
 
+  const startButton = document.getElementById('startButton');
+  const resetButton = document.getElementById('resetButton');
+  const countdownInput = document.getElementById('countdownInput');
   let timerInterval; // Variable to hold the setInterval ID
   let countdownTime; // Variable to hold the remaining countdown time
   let isPaused = false; // Variable to track pause state
-  let key = "interval fish's";
 
-  // Function to update the timer display
-  function updateTimer(seconds) {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const remainingSeconds = seconds % 60;
-    const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
-    timerDisplay.textContent = formattedTime;
+  let productive = ['Fish-tastic job!', 'Keep swimming :)', `You're really fish-tastic!`,
+      'I sea you working...', 'A true ocean master!', `You're such a starfish!`];
+  let unproductive = ['Oh, barnacles.',
+      `I don't sea you working hard.`, `I'm getting flooded...`, 'Your fish are gonna drown!', 
+      `Someone's finally taking a shower...`, 'Make more waves with your productivity'];
+
+  function chooseMessage(callback) {
+    let listURL = JSON.parse(localStorage.getItem("productivity under the sea")) || [];
+    let num = Math.floor(Math.random() * 6);
+    console.log(listURL);
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+      let currentTabURL = tabs[0].url;
+      console.log(currentTabURL);
+      if (listURL.some(url => currentTabURL.includes(url))) {
+          callback(unproductive[num]);
+      } else {
+          callback(productive[num]);
+      }
+    });
   }
+    
+      chooseMessage(function(message) {
+        chosenMessageText.innerText = message;
+      });
+
+  //updates the timer
+  function updateTime() {
+    chrome.storage.local.get(["timer"], (res) => {
+        const time = document.getElementById("timer");
+        const hours = `${Math.floor(res.timer / 3600)}`.padStart(2, "0");
+        let minutes = "00";
+        if (Math.floor((res.timer % 3600) / 60) > 0) {
+          minutes = `${Math.floor((res.timer % 3600) / 60) - 1}`.padStart(2, "0");
+        }
+        let seconds = "00";
+        if (res.timer % 60 !== 0) {
+            seconds = `${60 - (res.timer % 60)}`.padStart(2, "0");
+        }
+        console.log(hours, minutes, seconds)
+        time.textContent = `${hours}:${minutes}:${seconds}`;
+    });
+}
+  //is called once to initialize from countdown input
+  function setTimer() {
+      countdownTime = parseInt(countdownInput.value) * 60;
+      const inputTime = countdownTime;
+      if (!isNaN(inputTime)) {
+          chrome.storage.local.set({ "timer": inputTime });
+          updateTime();
+      }
+  }
+
+  // // Function to update the timer display
+  // function updateTimer(seconds) {
+  //   const hours = Math.floor(seconds / 3600);
+  //   const minutes = Math.floor((seconds % 3600) / 60);
+  //   const remainingSeconds = seconds % 60;
+  //   const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+  //   timerDisplay.textContent = formattedTime;
+  // }
 
   // Function to start the countdown timer
   function startCountdown() {
@@ -57,20 +78,14 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
 
-    //starts the water animation w the initial countdown time input
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, {action: 'startWaterAnimation', parameter: countdownTime});
-    });
-
     //initializes timer
-    updateTimer(countdownTime);
+    updateTime(countdownTime);
 
     //gets timer ending time from storage?
-    timerInterval = localStorage.getItem(key);
+    timerInterval = localStorage.getItem("productivity under the sea");
     
     // Start the countdown
     timerInterval = setInterval(function() {
-      console.log("hi");
       if (!isPaused) {
         countdownTime--;
         // Store countdownTime in chrome storage
@@ -79,15 +94,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
       if (countdownTime <= 0) {
         clearInterval(timerInterval);
-        // // Send a message to the content script
-        // chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-        //   chrome.tabs.sendMessage(tabs[0].id, { action: 'startWaterAnimation' });
-        // });
       }
     }, 1000);
 
     timerUpdateInterval = setInterval(function() {
-      updateTimer(countdownTime);
+      updateTime(countdownTime);
     })
 
     // Enable pause button and disable start button
@@ -105,44 +116,11 @@ document.addEventListener('DOMContentLoaded', function() {
     resetButton.disabled = false;
   }
 
-  //helper function to store prev time for resume
-  // Function to start the countdown timer after resuming
-  function resumeCountdownHelper(remainingTime) {
-    countdownTime = remainingTime;
-    if (isNaN(countdownTime) || countdownTime <= 0) {
-      alert('Invalid countdown time.');
-      return;
-    }
-    updateTimer(countdownTime);
-    // Start the countdown
-    timerInterval = setInterval(function() {
-      if (!isPaused) {
-        countdownTime--;
-        updateTimer(countdownTime);
-      }
-
-      if (countdownTime <= 0) {
-        clearInterval(timerInterval);
-        // Send a message to the content script
-        //TODO: send a new "resumeWaterAnimation" message
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-          chrome.tabs.sendMessage(tabs[0].id, {action: 'startWaterAnimation'});
-        });
-      }
-    }, 1000);
-
-  // Function to resume the countdown timer
-  function resumeCountdown(remainingTime) {
-    isPaused = false;
-    resumeCountdownHelper(remainingTime);
-  }
-}
-
   // Function to reset the countdown timer
   function resetCountdown() {
     clearInterval(timerInterval);
     countdownTime = 0;
-    updateTimer(countdownTime);
+    updateTime(countdownTime);
     isPaused = false;
     startButton.disabled = false;
     pauseButton.disabled = true;
@@ -152,18 +130,74 @@ document.addEventListener('DOMContentLoaded', function() {
     chrome.storage.sync.remove('countdownTime');
   }
 
-  startButton.addEventListener('click', function() {
-    if (isPaused) {
-      resumeCountdown(countdownTime);
-    } else {
-      startCountdown();
+  //helper function to store prev time for resume
+    // Function to start the countdown timer after resuming
+    function resumeCountdownHelper(remainingTime) {
+      countdownTime = remainingTime;
+      if (isNaN(countdownTime) || countdownTime <= 0) {
+        alert('Invalid countdown time.');
+        return;
+      }
+      updateTime(countdownTime);
+      // Start the countdown
+      timerInterval = setInterval(function() {
+        if (!isPaused) {
+          countdownTime--;
+          updateTime(countdownTime);
+        }
+  
+        if (countdownTime <= 0) {
+          clearInterval(timerInterval);
+          // Send a message to the content script
+          chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {action: 'startWaterAnimation'});
+          });
+        }
+      }, 1000);
+  
+    // Function to resume the countdown timer
+    function resumeCountdown(remainingTime) {
+      isPaused = false;
+      resumeCountdownHelper(remainingTime);
     }
-  });
+  }
+
+  updateTime();
+  setInterval(updateTime, 1000);
+
+  //resets the buttons back to default
+  resetButton.addEventListener("click", () => {
+    chrome.storage.local.set({
+      timer: 0,
+      isRunning: false,
+    }, () => {
+      startButton.textContent = "Start Timer"
+    })
+  })
+
+
+  //switches between start and pause and sets timer
+  startButton.addEventListener("click", () => {
+    chrome.storage.local.get(["isRunning"], (res) => {
+      chrome.storage.local.set({
+        isRunning: !res.isRunning, 
+      }, () => {
+        startButton.textContent = !res.isRunning ? "Pause Timer" : "Start Timer"
+        setTimer()
+
+        countdownTime = parseInt(countdownInput.value) * 60;
+        //starts the water animation w the initial countdown time input
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          chrome.tabs.sendMessage(tabs[0].id, {action: 'startWaterAnimation', parameter: countdownTime});
+        });
+
+      })
+    })
+    
+  })
+  
   pauseButton.addEventListener('click', pauseCountdown);
   resetButton.addEventListener('click', resetCountdown);
-
-
 });
-
-
+  
 
