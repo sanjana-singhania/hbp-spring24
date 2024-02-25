@@ -9,11 +9,11 @@ document.addEventListener('DOMContentLoaded', function() {
   const resetButton = document.getElementById('resetButton');
   const timerDisplay = document.getElementById('timer');
 
-  let productive = ['Fish-tastic job!', 'Keep swimming', 'You(\'re) really fish-tastic!',
-'I sea you working...', 'A true ocean master!', `You're such a starfish!`]
-  let unproductive = [`Don't forget about your fish!`, 'Oh, barnacles.',
-  `I don't sea you working hard.`, `I'm getting flooded...`, 'Your fish are gonna drown!', 'Wrong tab!', 
-  'Someone(\'s) finally taking a shower...', 'Make more waves with your productivity']
+  let productive = ['Fish-tastic job!', 'Keep swimming', `You're really fish-tastic!`,
+  'I sea you working...', 'A true ocean master!', `You're such a starfish!`]
+  let unproductive = ['Oh, barnacles.',
+  `I don't sea you working hard.`, `I'm getting flooded...`, 'Your fish are gonna drown!', 
+  `Someone's finally taking a shower...`, 'Make more waves with your productivity']
 
   // chrome.runtime.sendMessage({greeting: "hello"}, function(response) {
   //   console.log(response.farewell);
