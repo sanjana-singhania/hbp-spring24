@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function() {
   const chosenMessageText = document.getElementById('chosenMessage');
 
@@ -37,28 +36,32 @@ document.addEventListener('DOMContentLoaded', function() {
   //updates the timer
   function updateTime() {
     chrome.storage.local.get(["timer"], (res) => {
-        const time = document.getElementById("timer");
-        const hours = `${Math.floor(res.timer / 3600)}`.padStart(2, "0");
-        let minutes = "00";
-        if (Math.floor((res.timer % 3600) / 60) > 0) {
-          minutes = `${Math.floor((res.timer % 3600) / 60) - 1}`.padStart(2, "0");
-        }
-        let seconds = "00";
-        if (res.timer % 60 !== 0) {
-            seconds = `${60 - (res.timer % 60)}`.padStart(2, "0");
-        }
-        console.log(hours, minutes, seconds)
-        time.textContent = `${hours}:${minutes}:${seconds}`;
+      const totalSeconds = res.timer;
+      const displaySeconds = totalSeconds % 60;
+      const displayMinutes = Math.floor((totalSeconds % 3600) / 60);
+      const displayHours = Math.floor(totalSeconds / 3600);
+
+      const time = document.getElementById("timer");
+      const hours = String(displayHours).padStart(2, "0");
+      let minutes;
+      // if (displayMinutes > 0) {
+        // displayMinutes = String(displayMinutes - 1).padStart(2, "0");
+      // } else {
+        minutes = String(displayMinutes).padStart(2, "0");
+      // }
+      let seconds = String(displaySeconds).padStart(2, "0");
+      console.log(hours, minutes, seconds)
+      time.textContent = `${hours}:${minutes}:${seconds}`;
     });
 }
   //is called once to initialize from countdown input
   function setTimer() {
-      countdownTime = parseInt(countdownInput.value) * 60;
-      const inputTime = countdownTime;
-      if (!isNaN(inputTime)) {
-          chrome.storage.local.set({ "timer": inputTime });
+      // countdownTime = parseInt(countdownInput.value) * 60;
+      // const inputTime = countdownTime;
+      // if (!isNaN(inputTime)) {
+          // chrome.storage.local.set({ "timer": inputTime });
           updateTime();
-      }
+      // }
   }
 
   // // Function to update the timer display
@@ -114,6 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
     startButton.disabled = false;
     pauseButton.disabled = true;
     resetButton.disabled = false;
+    chrome.storage.local.set({ isRunning: false });
   }
 
   // Function to reset the countdown timer
@@ -178,13 +182,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
   //switches between start and pause and sets timer
   startButton.addEventListener("click", () => {
-    chrome.storage.local.get(["isRunning"], (res) => {
+    chrome.storage.local.get(["timer", "isRunning"], (res) => {
+      if (isNaN(res.timer) || res.timer <= 0) {
+        countdownTime = parseInt(countdownInput.value) * 60;
+        const inputTime = countdownTime;
+        if (!isNaN(inputTime)) {
+          chrome.storage.local.set({ "timer": inputTime });
+        }
+      }
+      setTimer();
       chrome.storage.local.set({
         isRunning: !res.isRunning, 
       }, () => {
         startButton.textContent = !res.isRunning ? "Pause Timer" : "Start Timer"
-        setTimer()
 
+        console.log("Starting timer! with time: " + countdownInput.value);
         countdownTime = parseInt(countdownInput.value) * 60;
         //starts the water animation w the initial countdown time input
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
@@ -200,4 +212,3 @@ document.addEventListener('DOMContentLoaded', function() {
   resetButton.addEventListener('click', resetCountdown);
 });
   
-
