@@ -1,0 +1,43 @@
+body{
+    background-color: rgb(213, 221, 224);
+    font-size: 25px;
+    width: 400px;
+    height: 240px;
+}
+#timer{
+    background: #fff;
+    color: #000;
+    width: 150px;
+    margin: 50px auto;
+    margin-left: center;
+    margin-top: 20px;
+    text-align: center;
+}
+#settings {
+    background-color: transparent;
+    max-width: 25px;
+    max-height: 25px;
+}
+
+
+.hover-text {
+    display: none; 
+}
+
+#settings:hover {
+    filter:brightness(75%);
+}
+
+#settings:hover .hover-text {
+    display: block; 
+    font-size: 15px;
+}
+
+.hover-text {
+    position:absolute; 
+    background-color:white; 
+    border:2px solid gray; 
+    display:none;
+    left: 50px;
+}
+

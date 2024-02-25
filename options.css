@@ -1,0 +1,120 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: rgb(213, 221, 224);
+}
+
+section {
+    margin: 10% 20%;
+    height: 50vh;
+    overflow-y: auto;
+    background-color: white;
+}
+/*
+.sidebar ul {
+    list-style-type: none;
+    display: flex;
+    justify-content: space-around;
+    padding: 0;
+    top: 1vh;
+    vertical-align: bottom;
+}
+
+.sidebar li {
+    padding: 2px 0px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+}
+*/
+.blockedURL {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    flex-wrap: wrap;
+    width: 250px;
+}
+.container {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    flex-wrap: wrap;
+}
+
+.container ul {
+    list-style-type: none;
+    padding: 10px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.container li {
+    padding: 2px 0px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    column-count: 5;
+}
+
+.container li a {
+    color: black;
+    display: block;
+    padding: 7%;
+}
+
+.listURL li:hover {
+    background-color: rgb(203, 210, 220);
+}
+
+#blockedURL {
+    display: flex;
+    align-items: center;
+}
+
+h1 {
+    font-size: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    padding: 2%;
+}
+
+h2 {
+    font-size: 10px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+}
+
+p {
+    font-size: 5px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+}
+
+.delete {
+    width: 100%;
+    padding-bottom: 0px;
+    font-size: 15px;
+    font-family: Arial, Helvetica, sans-serif;
+    bottom: 10px;
+    text-align: center;
+    margin-bottom: 0%;
+    
+    
+    
+}
