@@ -88,3 +88,69 @@ function pauseCountdown() {
 checkURL();
 
 setInterval(checkURL, 1000);
+
+/*
+let timerInterval;
+let countdownTime = 5 * 60;
+function runTimer(mins) {
+    const key = "timer";
+    localStorage.set(key, mins * 60);
+    timerInterval = setInterval(function() {
+        console.log("hi");
+        if (!isPaused) {
+          countdownTime--;
+          
+  
+          // Store countdownTime in chrome storage
+          chrome.storage.sync.set({ countdownTime: countdownTime });
+        }
+  
+        if (countdownTime <= 0) {
+          clearInterval(timerInterval);
+          // Send a message to the content script
+          chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, { action: 'startWaterAnimation' });
+          });
+        }
+      }, 1000);
+}
+runTimer(5);
+
+// Function to pause the countdown timer
+function pauseCountdown() {
+    clearInterval(timerInterval);
+    isPaused = true;
+    startButton.disabled = false;
+    pauseButton.disabled = true;
+    resetButton.disabled = false;
+  }
+
+// Function to resume the countdown timer
+function resumeCountdown(remainingTime) {
+    isPaused = false;
+    startCountdown();
+  }
+
+  // Function to reset the countdown timer
+  function resetCountdown() {
+    clearInterval(timerInterval);
+    countdownTime = 0;
+    updateTimer(countdownTime);
+    isPaused = false;
+    startButton.disabled = false;
+    pauseButton.disabled = true;
+    resetButton.disabled = true; // Disable the reset button after resetting the timer
+
+    // Remove countdownTime from chrome storage
+    chrome.storage.sync.remove('countdownTime');
+  }
+
+  chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        console.log("received message");
+        if (request.type === "GET_TIME_REMAINING") {
+            sendResponse({ countdownTime: countdownTime })
+        }
+    }
+  )
+*/

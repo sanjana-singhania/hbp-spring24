@@ -1,3 +1,4 @@
+
 var listURL = document.getElementById("blockedURL");
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -8,11 +9,15 @@ document.addEventListener('DOMContentLoaded', function() {
   const resetButton = document.getElementById('resetButton');
   const timerDisplay = document.getElementById('timer');
 
-  let productive = ['Fish-tastic Job!', 'Keep Swimming!', `You're really fish-tastic!`,
-    'I sea you working...', 'A true ocean master!', `You're such a starfish!`];
+  let productive = ['Fish-tastic job!', 'Keep swimming', 'You(\'re) really fish-tastic!',
+'I sea you working...', 'A true ocean master!', `You're such a starfish!`]
   let unproductive = [`Don't forget about your fish!`, 'Oh, barnacles.',
-    `I don't sea you working hard`, `I'm getting flooded...`,
-    'Make more waves with your productivity', `Looks like you're swimming in an unproductive area!`];
+  `I don't sea you working hard.`, `I'm getting flooded...`, 'Your fish are gonna drown!', 'Wrong tab!', 
+  'Someone(\'s) finally taking a shower...', 'Make more waves with your productivity']
+
+  // chrome.runtime.sendMessage({greeting: "hello"}, function(response) {
+  //   console.log(response.farewell);
+  // })
 
   function chooseMessage() {
     let num = Math.floor(Math.random() * 6)
@@ -52,26 +57,32 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
 
+    //starts the water animation w the initial countdown time input
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, {action: 'startWaterAnimation', parameter: countdownTime});
+    });
+
+    //initializes timer
     updateTimer(countdownTime);
 
+    //gets timer ending time from storage?
     timerInterval = localStorage.getItem(key);
+    
     // Start the countdown
     timerInterval = setInterval(function() {
       console.log("hi");
       if (!isPaused) {
         countdownTime--;
-        
-
         // Store countdownTime in chrome storage
         chrome.storage.sync.set({ countdownTime: countdownTime });
       }
 
       if (countdownTime <= 0) {
         clearInterval(timerInterval);
-        // Send a message to the content script
-        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-          chrome.tabs.sendMessage(tabs[0].id, { action: 'startWaterAnimation' });
-        });
+        // // Send a message to the content script
+        // chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+        //   chrome.tabs.sendMessage(tabs[0].id, { action: 'startWaterAnimation' });
+        // });
       }
     }, 1000);
 
@@ -94,11 +105,38 @@ document.addEventListener('DOMContentLoaded', function() {
     resetButton.disabled = false;
   }
 
+  //helper function to store prev time for resume
+  // Function to start the countdown timer after resuming
+  function resumeCountdownHelper(remainingTime) {
+    countdownTime = remainingTime;
+    if (isNaN(countdownTime) || countdownTime <= 0) {
+      alert('Invalid countdown time.');
+      return;
+    }
+    updateTimer(countdownTime);
+    // Start the countdown
+    timerInterval = setInterval(function() {
+      if (!isPaused) {
+        countdownTime--;
+        updateTimer(countdownTime);
+      }
+
+      if (countdownTime <= 0) {
+        clearInterval(timerInterval);
+        // Send a message to the content script
+        //TODO: send a new "resumeWaterAnimation" message
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          chrome.tabs.sendMessage(tabs[0].id, {action: 'startWaterAnimation'});
+        });
+      }
+    }, 1000);
+
   // Function to resume the countdown timer
   function resumeCountdown(remainingTime) {
     isPaused = false;
-    startCountdown();
+    resumeCountdownHelper(remainingTime);
   }
+}
 
   // Function to reset the countdown timer
   function resetCountdown() {
@@ -119,9 +157,6 @@ document.addEventListener('DOMContentLoaded', function() {
       resumeCountdown(countdownTime);
     } else {
       startCountdown();
-      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {action: 'startWaterAnimation'});
-      });
     }
   });
   pauseButton.addEventListener('click', pauseCountdown);
@@ -129,5 +164,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 });
+
 
 

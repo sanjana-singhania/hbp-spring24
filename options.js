@@ -12,14 +12,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function addToLocal(url) {
-        let items = localStorage.getItem(key);
-        if(items) {
-            items = JSON.parse(items);
+        let items = JSON.parse(localStorage.getItem(key) || '[]');
+        if (!items.includes(url)) {
+            items.push(url);
         }
-        if(!items) {
-            items = [];
-        }
-        items.push(url);
         localStorage.setItem(key, JSON.stringify(items));
     }
 
@@ -34,16 +30,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         }
-        
+
     }
 
     populateFromLocal();
     function removeFromLocal(url) {
-        let items = localStorage.getItem(key);
-        if(!items) {
-            items = [];
-        }
-        items.remove(url);
+        let items = JSON.parse(localStorage.getItem(key) || '[]');
+        items = items.filter(item => item !== url);
         localStorage.setItem(key, JSON.stringify(items));
     }
 
@@ -64,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var clickedItem = event.target;
         if (clickedItem.tagName === 'LI') { // Ensure that the clicked element is a list item
             clickedItem.remove(); // Remove the clicked list item
-            removeFromLocal(clickedItem.getText());
+            removeFromLocal(clickedItem.innerText);
         }
 
     });
